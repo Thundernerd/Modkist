@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/TNRD/Scenes/LoaderScene.unity
+    guid: b21028c765de61749bbb2ccb487553e5
+  - enabled: 1
+    path: Assets/TNRD/Scenes/SettingScene.unity
+    guid: c933d91e05e97c142be63517967677f2
+  - enabled: 1
+    path: Assets/TNRD/Scenes/InstallerScene.unity
+    guid: 3a8f5bb37a312e14aaf520f353f18713
+  - enabled: 1
+    path: Assets/Plugins/mod.io/Samples/ModBrowser/2017.3/Example Scene.unity
+    guid: 317b2d460fea74545a7b18f91533e0a6
+  m_configObjects: {}

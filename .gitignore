@@ -58,3 +58,7 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+/mod.io
+.idea
+Assets/Resources/modio_settings.asset
+Assets/Resources/modio_settings.asset.meta
