@@ -6,7 +6,6 @@ using Ionic.Zip;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace TNRD
 {
@@ -15,20 +14,21 @@ namespace TNRD
         private const string URL =
             "https://github.com/BepInEx/BepInEx/releases/download/v5.4.19/BepInEx_x64_5.4.19.0.zip";
 
-        private IEnumerator Start()
+        private void Awake()
         {
             if (HasBepInEx())
             {
                 LoadScene();
-                yield break;
             }
+        }
 
+        private IEnumerator Start()
+        {
             string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(tempDirectory);
 
             UnityWebRequest webRequest = UnityWebRequest.Get(URL);
             yield return webRequest.SendWebRequest();
-
 
             try
             {
