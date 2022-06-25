@@ -23,12 +23,10 @@ namespace ModIO.UI
 
         // ---------[ FIELDS ]---------
         /// <summary>Currently displayed mod profile.</summary>
-        [SerializeField]
-        private ModProfile m_profile = null;
+        [SerializeField] private ModProfile m_profile = null;
 
         /// <summary>Currently displayed mod statistics.</summary>
-        [SerializeField]
-        private ModStatistics m_statistics = null;
+        [SerializeField] private ModStatistics m_statistics = null;
 
         /// <summary>Replace an empty description with the summary?</summary>
         [Tooltip(
@@ -45,25 +43,24 @@ namespace ModIO.UI
         /// <summary>Currently displayed mod profile.</summary>
         public ModProfile profile
         {
-            get {
-                return this.m_profile;
-            }
-            set {
-                if(this.m_profile != value)
+            get { return this.m_profile; }
+            set
+            {
+                if (this.m_profile != value)
                 {
                     this.m_profile = value;
 
-                    if(this.replaceMissingDescription && this.m_profile != null)
+                    if (this.replaceMissingDescription && this.m_profile != null)
                     {
-                        if(string.IsNullOrEmpty(this.m_profile.descriptionAsText)
-                           && string.IsNullOrEmpty(this.m_profile.descriptionAsHTML))
+                        if (string.IsNullOrEmpty(this.m_profile.descriptionAsText)
+                            && string.IsNullOrEmpty(this.m_profile.descriptionAsHTML))
                         {
                             this.m_profile.descriptionAsText = this.m_profile.summary;
                             this.m_profile.descriptionAsHTML = this.m_profile.summary;
                         }
                     }
 
-                    if(this.onProfileChanged != null)
+                    if (this.onProfileChanged != null)
                     {
                         this.onProfileChanged.Invoke(this.m_profile);
                     }
@@ -74,15 +71,14 @@ namespace ModIO.UI
         /// <summary>Currently displayed mod statistics.</summary>
         public ModStatistics statistics
         {
-            get {
-                return this.m_statistics;
-            }
-            set {
-                if(this.m_statistics != value)
+            get { return this.m_statistics; }
+            set
+            {
+                if (this.m_statistics != value)
                 {
                     this.m_statistics = value;
 
-                    if(this.onStatisticsChanged != null)
+                    if (this.onStatisticsChanged != null)
                     {
                         this.onStatisticsChanged.Invoke(this.m_statistics);
                     }
@@ -94,16 +90,17 @@ namespace ModIO.UI
         /// <summary>Collects and sets view on IModViewElements.</summary>
         protected virtual void Start()
         {
+            MethodLogger.LogCall();
 #if UNITY_EDITOR
             ModView[] nested = this.gameObject.GetComponentsInChildren<ModView>(true);
-            if(nested.Length > 1)
+            if (nested.Length > 1)
             {
                 Debug.LogError(
                     "[mod.io] Nesting ModViews is currently not supported due to the"
-                        + " way IModViewElement component parenting works."
-                        + "\nThe nested ModViews must be removed to allow ModView functionality."
-                        + "\nthis=" + this.gameObject.name
-                        + "\nnested=" + nested[1].gameObject.name,
+                    + " way IModViewElement component parenting works."
+                    + "\nThe nested ModViews must be removed to allow ModView functionality."
+                    + "\nthis=" + this.gameObject.name
+                    + "\nnested=" + nested[1].gameObject.name,
                     this);
                 return;
             }
@@ -111,7 +108,7 @@ namespace ModIO.UI
 
             // assign mod view elements to this
             var modViewElements = this.gameObject.GetComponentsInChildren<IModViewElement>(true);
-            foreach(IModViewElement viewElement in modViewElements)
+            foreach (IModViewElement viewElement in modViewElements)
             {
                 viewElement.SetModView(this);
             }
@@ -121,7 +118,8 @@ namespace ModIO.UI
         /// <summary>Instructs the view manager to inspect the currently displayed mod.</summary>
         public void InspectMod()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ViewManager.instance.InspectMod(this.m_profile.id);
             }
@@ -130,7 +128,8 @@ namespace ModIO.UI
         /// <summary>Opens the report dialog for the current mod.</summary>
         public void ReportMod()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ViewManager.instance.ReportMod(this.m_profile.id);
             }
@@ -139,7 +138,8 @@ namespace ModIO.UI
         /// <summary>Attempts to subscribe to the currently displayed mod.</summary>
         public void AttemptSubscribe()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ModBrowser.instance.SubscribeToMod(this.m_profile.id);
             }
@@ -148,7 +148,8 @@ namespace ModIO.UI
         /// <summary>Attempts to unsubscribe from the currently displayed mod.</summary>
         public void AttemptUnsubscribe()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 Action doUnsub = () =>
                 {
@@ -157,22 +158,25 @@ namespace ModIO.UI
                 };
 
                 Action cancelUnsub = () =>
-                { ViewManager.instance.CloseWindowedView(ViewManager.instance.messageDialog); };
+                {
+                    ViewManager.instance.CloseWindowedView(ViewManager.instance.messageDialog);
+                };
 
                 Action onClose = () =>
                 {
                     bool isSubbed = LocalUser.SubscribedModIds.Contains(this.m_profile.id);
-                    foreach(var subDisplay in this.gameObject
-                                .GetComponentsInChildren<ModSubscribedDisplay>())
+                    foreach (var subDisplay in this.gameObject
+                                 .GetComponentsInChildren<ModSubscribedDisplay>())
                     {
                         subDisplay.DisplayModSubscribed(this.m_profile.id, isSubbed);
                     }
                 };
 
-                var messageData = new MessageDialog.Data() {
+                var messageData = new MessageDialog.Data()
+                {
                     header = "Unsubscribe Confirmation",
                     message = ("Do you wish to unsubscribe from " + this.m_profile.name
-                               + " and uninstall it from your system?"),
+                                                                  + " and uninstall it from your system?"),
                     warningButtonText = "Unsubscribe",
                     warningButtonCallback = doUnsub,
                     standardButtonText = "Cancel",
@@ -187,7 +191,8 @@ namespace ModIO.UI
         /// <summary>Attempts to enable the currently displayed mod.</summary>
         public void AttemptEnableMod()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ModBrowser.instance.EnableMod(this.m_profile.id);
             }
@@ -196,7 +201,8 @@ namespace ModIO.UI
         /// <summary>Attempts to disable the currently displayed mod.</summary>
         public void AttemptDisableMod()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ModBrowser.instance.DisableMod(this.m_profile.id);
             }
@@ -205,7 +211,8 @@ namespace ModIO.UI
         /// <summary>Attempts to add a positive rating the currently displayed mod.</summary>
         public void AttemptRatePositive()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ModBrowser.instance.AttemptRateMod(this.m_profile.id, ModRatingValue.Positive);
             }
@@ -214,53 +221,44 @@ namespace ModIO.UI
         /// <summary>Attempts to add a negative rating the currently displayed mod.</summary>
         public void AttemptRateNegative()
         {
-            if(this.m_profile != null)
+            MethodLogger.LogCall();
+            if (this.m_profile != null)
             {
                 ModBrowser.instance.AttemptRateMod(this.m_profile.id, ModRatingValue.Negative);
             }
         }
 
         // ---------[ OBSOLETE ]---------
-        [Obsolete]
-        public event Action<ModView> onClick;
-        [Obsolete]
-        public event Action<ModView> subscribeRequested;
-        [Obsolete]
-        public event Action<ModView> unsubscribeRequested;
-        [Obsolete]
-        public event Action<ModView> enableModRequested;
-        [Obsolete]
-        public event Action<ModView> disableModRequested;
-        [Obsolete]
-        public event Action<ModView> ratePositiveRequested;
-        [Obsolete]
-        public event Action<ModView> rateNegativeRequested;
+        [Obsolete] public event Action<ModView> onClick;
+        [Obsolete] public event Action<ModView> subscribeRequested;
+        [Obsolete] public event Action<ModView> unsubscribeRequested;
+        [Obsolete] public event Action<ModView> enableModRequested;
+        [Obsolete] public event Action<ModView> disableModRequested;
+        [Obsolete] public event Action<ModView> ratePositiveRequested;
+        [Obsolete] public event Action<ModView> rateNegativeRequested;
 
         [Obsolete("No longer necessary.")]
-        public void Initialize() {}
+        public void Initialize()
+        {
+        }
 
-        [Obsolete("No longer supported.")]
-        [HideInInspector]
-        [SerializeField]
+        [Obsolete("No longer supported.")] [HideInInspector] [SerializeField]
         private ModDisplayData m_data = new ModDisplayData();
 
         [Obsolete("No longer supported. Use ModView.profile and ModView.statistics instead.")]
         public ModDisplayData data
         {
-            get {
-                return this.m_data;
-            }
-            set {
-                this.m_data = value;
-            }
+            get { return this.m_data; }
+            set { this.m_data = value; }
         }
 
         [Obsolete(
-            "Use ModProfileFieldDisplay components instead.")] [HideInInspector] public ModProfileDisplayComponent
+            "Use ModProfileFieldDisplay components instead.")]
+        [HideInInspector]
+        public ModProfileDisplayComponent
             profileDisplay;
 
-        [Obsolete("Use ModLogoDisplay component instead.")]
-        [HideInInspector]
+        [Obsolete("Use ModLogoDisplay component instead.")] [HideInInspector]
         public ImageDisplay logoDisplay;
 
         [Obsolete(
@@ -275,24 +273,20 @@ namespace ModIO.UI
             public UserProfileDisplayComponent profile;
             public ImageDisplay avatar;
         }
-        [Obsolete("Use a ModSubmittorDisplay component instead.")]
-        [HideInInspector]
+
+        [Obsolete("Use a ModSubmittorDisplay component instead.")] [HideInInspector]
         public SubmittorDisplay submittorDisplay;
 
-        [Obsolete("Use a CurrentBuildDisplay component instead.")]
-        [HideInInspector]
+        [Obsolete("Use a CurrentBuildDisplay component instead.")] [HideInInspector]
         public ModfileDisplayComponent buildDisplay;
 
-        [Obsolete("Use a TagContainer or TagCollectionTextDisplay component instead.")]
-        [HideInInspector]
+        [Obsolete("Use a TagContainer or TagCollectionTextDisplay component instead.")] [HideInInspector]
         public ModTagCollectionDisplayComponent tagsDisplay;
 
-        [Obsolete("Use a ModEnabledDisplay component instead.")]
-        [HideInInspector]
+        [Obsolete("Use a ModEnabledDisplay component instead.")] [HideInInspector]
         public StateToggleDisplay modEnabledDisplay;
 
-        [Obsolete("Use a ModSubscribedDisplay component instead.")]
-        [HideInInspector]
+        [Obsolete("Use a ModSubscribedDisplay component instead.")] [HideInInspector]
         public StateToggleDisplay subscriptionDisplay;
 
         [Obsolete]
@@ -302,23 +296,27 @@ namespace ModIO.UI
             public StateToggleDisplay positive;
             public StateToggleDisplay negative;
         }
-        [Obsolete("Use a ModUserRatingDisplay component instead.")]
-        [HideInInspector]
+
+        [Obsolete("Use a ModUserRatingDisplay component instead.")] [HideInInspector]
         public UserRatingDisplay userRatingDisplay;
 
-        [Obsolete("Use ModStatisticsFieldDisplay components instead.")]
-        [HideInInspector]
+        [Obsolete("Use ModStatisticsFieldDisplay components instead.")] [HideInInspector]
         public ModStatisticsDisplayComponent statisticsDisplay;
 
-        [Obsolete("Use ModBinaryDownloadDisplay instead.")]
-        [HideInInspector]
+        [Obsolete("Use ModBinaryDownloadDisplay instead.")] [HideInInspector]
         public DownloadDisplayComponent downloadDisplay;
 
         [Obsolete("Set via ModView.profile and ModView.statistics instead.")]
-        public void DisplayMod(ModProfile profile, ModStatistics statistics,
-                               IEnumerable<ModTagCategory> tagCategories, bool isSubscribed,
-                               bool isModEnabled, ModRatingValue userRating = ModRatingValue.None)
+        public void DisplayMod(
+            ModProfile profile,
+            ModStatistics statistics,
+            IEnumerable<ModTagCategory> tagCategories,
+            bool isSubscribed,
+            bool isModEnabled,
+            ModRatingValue userRating = ModRatingValue.None
+        )
         {
+            MethodLogger.LogCall();
             this.profile = profile;
             this.statistics = statistics;
         }
@@ -326,19 +324,22 @@ namespace ModIO.UI
         [Obsolete("No longer supported.")]
         public void DisplayLoading()
         {
+            MethodLogger.LogCall();
             throw new System.NotImplementedException();
         }
 
         [Obsolete("No longer supported. Use a ModBinaryDownloadDisplay component instead.")]
         public void DisplayDownload(FileDownloadInfo downloadInfo)
         {
+            MethodLogger.LogCall();
             throw new System.NotImplementedException();
         }
 
         [Obsolete("Use InspectMod() instead.")]
         public void NotifyClicked()
         {
-            if(onClick != null)
+            MethodLogger.LogCall();
+            if (onClick != null)
             {
                 onClick(this);
             }
@@ -347,15 +348,18 @@ namespace ModIO.UI
         [Obsolete("Use AttemptSubscribe() instead.")]
         public void NotifySubscribeRequested()
         {
-            if(subscribeRequested != null)
+            MethodLogger.LogCall();
+            if (subscribeRequested != null)
             {
                 subscribeRequested(this);
             }
         }
+
         [Obsolete("Use AttemptUnsubscribe() instead.")]
         public void NotifyUnsubscribeRequested()
         {
-            if(unsubscribeRequested != null)
+            MethodLogger.LogCall();
+            if (unsubscribeRequested != null)
             {
                 unsubscribeRequested(this);
             }
@@ -364,31 +368,38 @@ namespace ModIO.UI
         [Obsolete("Use AttemptEnableMod() instead.")]
         public void NotifyEnableModRequested()
         {
-            if(enableModRequested != null)
+            MethodLogger.LogCall();
+            if (enableModRequested != null)
             {
                 enableModRequested(this);
             }
         }
+
         [Obsolete("Use AttemptDisableMod() instead.")]
         public void NotifyDisableModRequested()
         {
-            if(disableModRequested != null)
+            MethodLogger.LogCall();
+            if (disableModRequested != null)
             {
                 disableModRequested(this);
             }
         }
+
         [Obsolete("Use AttemptRatePositive() instead.")]
         public void NotifyRatePositiveRequested()
         {
-            if(this.ratePositiveRequested != null)
+            MethodLogger.LogCall();
+            if (this.ratePositiveRequested != null)
             {
                 this.ratePositiveRequested(this);
             }
         }
+
         [Obsolete("Use AttemptRateNegative() instead.")]
         public void NotifyRateNegativeRequested()
         {
-            if(this.rateNegativeRequested != null)
+            MethodLogger.LogCall();
+            if (this.rateNegativeRequested != null)
             {
                 this.rateNegativeRequested(this);
             }

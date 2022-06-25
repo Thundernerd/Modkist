@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace ModIO.UI
@@ -7,8 +6,8 @@ namespace ModIO.UI
     /// <summary>Component used to display the subscribed state of a mod.</summary>
     [RequireComponent(typeof(StateToggleDisplay))]
     public class ModSubscribedDisplay : MonoBehaviour,
-                                        IModViewElement,
-                                        IModSubscriptionsUpdateReceiver
+        IModViewElement,
+        IModSubscriptionsUpdateReceiver
     {
         // ---------[ FIELDS ]---------
         /// <summary>Parent ModView.</summary>
@@ -21,14 +20,15 @@ namespace ModIO.UI
         /// <summary>IModViewElement interface.</summary>
         public void SetModView(ModView view)
         {
+            MethodLogger.LogCall();
             // early out
-            if(this.m_view == view)
+            if (this.m_view == view)
             {
                 return;
             }
 
             // unhook
-            if(this.m_view != null)
+            if (this.m_view != null)
             {
                 this.m_view.onProfileChanged.RemoveListener(DisplayModSubscribed);
             }
@@ -37,7 +37,7 @@ namespace ModIO.UI
             this.m_view = view;
 
             // hook
-            if(this.m_view != null)
+            if (this.m_view != null)
             {
                 this.m_view.onProfileChanged.AddListener(DisplayModSubscribed);
                 this.DisplayModSubscribed(this.m_view.profile);
@@ -52,8 +52,9 @@ namespace ModIO.UI
         /// <summary>Displays the subscribed state of a mod.</summary>
         public void DisplayModSubscribed(ModProfile profile)
         {
+            MethodLogger.LogCall();
             int modId = ModProfile.NULL_ID;
-            if(profile != null)
+            if (profile != null)
             {
                 modId = profile.id;
             }
@@ -64,6 +65,7 @@ namespace ModIO.UI
         /// <summary>Displays the subscribed state of a mod.</summary>
         public void DisplayModSubscribed(int modId)
         {
+            MethodLogger.LogCall();
             bool isSubscribed = LocalUser.SubscribedModIds.Contains(modId);
             this.DisplayModSubscribed(modId, isSubscribed);
         }
@@ -71,10 +73,11 @@ namespace ModIO.UI
         /// <summary>Displays the given subscribed state of a mod.</summary>
         public void DisplayModSubscribed(int modId, bool isSubscribed)
         {
+            MethodLogger.LogCall();
             this.m_modId = modId;
 
-            foreach(StateToggleDisplay display in this.gameObject
-                        .GetComponents<StateToggleDisplay>())
+            foreach (StateToggleDisplay display in this.gameObject
+                         .GetComponents<StateToggleDisplay>())
             {
                 display.isOn = isSubscribed;
             }
@@ -82,14 +85,17 @@ namespace ModIO.UI
 
         // ---------[ EVENTS ]---------
         /// <summary>IModSubscriptionsUpdateReceiver interface</summary>
-        public void OnModSubscriptionsUpdated(IList<int> addedSubscriptions,
-                                              IList<int> removedSubscriptions)
+        public void OnModSubscriptionsUpdated(
+            IList<int> addedSubscriptions,
+            IList<int> removedSubscriptions
+        )
         {
-            if(addedSubscriptions.Contains(this.m_modId))
+            MethodLogger.LogCall();
+            if (addedSubscriptions.Contains(this.m_modId))
             {
                 this.DisplayModSubscribed(this.m_modId, true);
             }
-            else if(removedSubscriptions.Contains(this.m_modId))
+            else if (removedSubscriptions.Contains(this.m_modId))
             {
                 this.DisplayModSubscribed(this.m_modId, false);
             }

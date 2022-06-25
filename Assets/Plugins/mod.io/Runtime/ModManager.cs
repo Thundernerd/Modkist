@@ -6,6 +6,7 @@ using Path = System.IO.Path;
 using UnityEngine;
 
 using ModIO.API;
+using ModIO.UI;
 
 namespace ModIO
 {
@@ -81,6 +82,28 @@ namespace ModIO
         {
             // Needs to have a valid mod id otherwise we mess with player-added mods!
             Debug.Assert(modId != ModProfile.NULL_ID);
+            
+            void OnGetDependenciesSuccess(RequestPage<ModDependency> page)
+            {
+                foreach (ModDependency dependency in page.items)
+                {
+                    ModBrowser.instance.SubscribeToMod(dependency.modId);
+                }
+            }
+
+            void OnGetDependenciesFailed(WebRequestError requestError)
+            {
+                MessageSystem.QueueMessage(
+                    MessageDisplayData.Type.Warning,
+                    "Failed to start mod downloads. They will be retried shortly.\n"
+                    + requestError.displayMessage);
+            }
+            
+            APIClient.GetAllModDependencies(modId,
+                RequestFilter.None,
+                new APIPaginationParameters(),
+                OnGetDependenciesSuccess,
+                OnGetDependenciesFailed);
 
             // Define vars
             string installDirectory = ModManager.GetModInstallDirectory(modId, modfileId);
@@ -399,6 +422,7 @@ namespace ModIO
         public static void DownloadAndUpdateMod(int modId, Action onSuccess,
                                                 Action<WebRequestError> onError)
         {
+            Debug.Log("[DOWNLOADING MOD]");
             Debug.Assert(modId != ModProfile.NULL_ID);
 
             // vars
