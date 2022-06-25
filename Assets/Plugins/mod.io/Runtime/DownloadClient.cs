@@ -46,6 +46,7 @@ namespace ModIO
         // ---------[ IMAGE DOWNLOADS ]---------
         public static ImageRequest DownloadModLogo(ModProfile profile, LogoSize size)
         {
+            MethodLogger.LogCall();
             Debug.Assert(profile != null, "[mod.io] Profile parameter cannot be null");
 
             return DownloadImage(profile.logoLocator.GetSizeURL(size));
@@ -55,6 +56,7 @@ namespace ModIO
         public static ImageRequest DownloadModGalleryImage(ModProfile profile, string imageFileName,
                                                            ModGalleryImageSize size)
         {
+            MethodLogger.LogCall();
             Debug.Assert(profile != null, "[mod.io] Profile parameter cannot be null");
             Debug.Assert(
                 !String.IsNullOrEmpty(imageFileName),
@@ -89,6 +91,7 @@ namespace ModIO
         public static ImageRequest DownloadModGalleryImage(GalleryImageLocator imageLocator,
                                                            ModGalleryImageSize size)
         {
+            MethodLogger.LogCall();
             Debug.Assert(imageLocator != null, "[mod.io] imageLocator parameter cannot be null.");
             Debug.Assert(
                 !String.IsNullOrEmpty(imageLocator.fileName),
@@ -101,6 +104,7 @@ namespace ModIO
 
         public static ImageRequest DownloadUserAvatar(UserProfile profile, UserAvatarSize size)
         {
+            MethodLogger.LogCall();
             Debug.Assert(profile != null, "[mod.io] Profile parameter cannot be null");
 
             ImageRequest request = null;
@@ -120,6 +124,7 @@ namespace ModIO
 
         public static ImageRequest DownloadYouTubeThumbnail(string youTubeId)
         {
+            MethodLogger.LogCall();
             Debug.Assert(!String.IsNullOrEmpty(youTubeId),
                          "[mod.io] YouTube video identifier cannot be empty");
 
@@ -134,6 +139,7 @@ namespace ModIO
 
         public static ImageRequest DownloadImage(string imageURL)
         {
+            MethodLogger.LogCall();
             ImageRequest request = new ImageRequest();
             request.isDone = false;
 
@@ -155,6 +161,7 @@ namespace ModIO
         private static void OnImageDownloadCompleted(UnityWebRequestAsyncOperation operation,
                                                      ImageRequest request)
         {
+            MethodLogger.LogCall();
             UnityWebRequest webRequest = operation.webRequest;
             request.isDone = true;
 
@@ -184,6 +191,7 @@ namespace ModIO
 
         public static FileDownloadInfo GetActiveModBinaryDownload(int modId, int modfileId)
         {
+            MethodLogger.LogCall();
             ModfileIdPair idPair = new ModfileIdPair() {
                 modId = modId,
                 modfileId = modfileId,
@@ -201,6 +209,7 @@ namespace ModIO
         public static FileDownloadInfo StartModBinaryDownload(int modId, int modfileId,
                                                               string targetFilePath)
         {
+            MethodLogger.LogCall();
             ModfileIdPair idPair = new ModfileIdPair() {
                 modId = modId,
                 modfileId = modfileId,
@@ -250,6 +259,7 @@ namespace ModIO
         public static FileDownloadInfo StartModBinaryDownload(Modfile modfile,
                                                               string targetFilePath)
         {
+            MethodLogger.LogCall();
             ModfileIdPair idPair = new ModfileIdPair() {
                 modId = modfile.modId,
                 modfileId = modfile.id,
@@ -281,6 +291,7 @@ namespace ModIO
 
         private static void DownloadModBinary_Internal(ModfileIdPair idPair, string downloadURL)
         {
+            MethodLogger.LogCall();
             FileDownloadInfo downloadInfo = modfileDownloadMap[idPair];
             downloadInfo.request = UnityWebRequest.Get(downloadURL);
 
@@ -328,6 +339,7 @@ namespace ModIO
 
         public static void CancelModBinaryDownload(int modId, int modfileId)
         {
+            MethodLogger.LogCall();
             ModfileIdPair idPair = new ModfileIdPair() {
                 modId = modId,
                 modfileId = modfileId,
@@ -338,6 +350,7 @@ namespace ModIO
 
         public static void CancelAnyModBinaryDownloads(int modId)
         {
+            MethodLogger.LogCall();
             List<ModfileIdPair> downloadsToCancel = new List<ModfileIdPair>();
 
             foreach(var kvp in modfileDownloadMap)
@@ -353,6 +366,7 @@ namespace ModIO
 
         private static void CancelModfileDownload_Internal(ModfileIdPair idPair)
         {
+            MethodLogger.LogCall();
             FileDownloadInfo downloadInfo = null;
             if(modfileDownloadMap.TryGetValue(idPair, out downloadInfo))
             {
@@ -372,6 +386,7 @@ namespace ModIO
 
         private static void OnModBinaryRequestCompleted(ModfileIdPair idPair)
         {
+            MethodLogger.LogCall();
             FileDownloadInfo downloadInfo = DownloadClient.modfileDownloadMap[idPair];
             UnityWebRequest request = downloadInfo.request;
 
@@ -442,6 +457,7 @@ namespace ModIO
 
         private static void FinalizeDownload(ModfileIdPair idPair, FileDownloadInfo downloadInfo)
         {
+            MethodLogger.LogCall();
             downloadInfo.bytesPerSecond = 0;
             downloadInfo.isDone = true;
 
@@ -460,6 +476,7 @@ namespace ModIO
 
         private static void StartMonitoringSpeed()
         {
+            MethodLogger.LogCall();
             if(DownloadClient.monitorBehaviour == null)
             {
                 GameObject go = new GameObject("[mod.io] Download Speed Monitor");
@@ -476,6 +493,7 @@ namespace ModIO
 
         private static System.Collections.IEnumerator SpeedMonitorCoroutine()
         {
+            MethodLogger.LogCall();
             while(DownloadClient.modfileDownloadMap.Count > 0)
             {
                 int downloadCount = DownloadClient.modfileDownloadMap.Count;
@@ -523,6 +541,7 @@ namespace ModIO
 
         private static Int64 CalculateAverageDownloadSpeed(DownloadProgressMarkerCollection markers)
         {
+            MethodLogger.LogCall();
             if(markers.lastIndex < 0 || markers.recordedCount <= 1)
             {
                 return 0;
@@ -547,6 +566,7 @@ namespace ModIO
         private static void AddDownloadProgressMarker(DownloadProgressMarkerCollection markers,
                                                       Int64 bytesReceived)
         {
+            MethodLogger.LogCall();
             float now = Time.unscaledTime;
 
             // ignore if not newer timeStamp
