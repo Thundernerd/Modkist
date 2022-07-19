@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Gameloop.Vdf;
 using Gameloop.Vdf.Linq;
 using JetBrains.Annotations;
@@ -12,7 +13,7 @@ namespace TNRD
     {
         private void Start()
         {
-            if (!string.IsNullOrEmpty(Preferences.GamePath) || TryAutoConfigure())
+            if (TryAutoConfigure())
             {
                 SceneManager.LoadScene(sceneBuildIndex: 2);
             }
@@ -81,9 +82,14 @@ namespace TNRD
 
             foreach (VToken token in root.Value)
             {
-                if (TryGetPathFromToken(token, out string steamGamesFolder))
+                if (!TryGetPathFromToken(token, out string steamGamesFolder)) 
+                    continue;
+
+                string manifestPath = Path.Combine(steamGamesFolder, "steamapps", "appmanifest_1440670.acf");
+                string zeepkistPath = Path.Combine(steamGamesFolder, "steamapps", "common", "Zeepkist");
+                if (File.Exists(manifestPath) && Directory.Exists(zeepkistPath))
                 {
-                    gameFolder = Path.Combine(steamGamesFolder, "steamapps", "common", "Zeepkist");
+                    gameFolder = zeepkistPath;
                     return true;
                 }
             }
@@ -91,9 +97,9 @@ namespace TNRD
             return false;
         }
 
-        private static bool TryGetPathFromToken(VToken token, out string gameFolder)
+        private static bool TryGetPathFromToken(VToken token, out string path)
         {
-            gameFolder = null;
+            path = null;
             if (token.Type != VTokenType.Property)
                 return false;
 
@@ -102,27 +108,16 @@ namespace TNRD
                 return false;
 
             VObject vObject = property.Value.Value<VObject>();
-            if (!vObject.TryGetValue("apps", out VToken apps))
+            if (!vObject.TryGetValue("path", out VToken pathToken))
                 return false;
 
-            if (apps.Type != VTokenType.Object)
+            if (pathToken.Type != VTokenType.Value)
                 return false;
 
-            VObject appsObj = apps.Value<VObject>();
-            if (appsObj.ContainsKey("1440670"))
-            {
-                if (vObject.TryGetValue("path", out VToken pathToken))
-                {
-                    gameFolder = pathToken.Value<VValue>().ToString();
-                    return true;
-                }
-                else
-                {
-                    // This seems kinda problematic?
-                }
-            }
+            VValue value = pathToken.Value<VValue>();
+            path = value.Value.ToString();
 
-            return false;
+            return true;
         }
     }
 }
