@@ -13,14 +13,16 @@ namespace TNRD
     {
         private void Start()
         {
-            if (TryAutoConfigure())
+            try
             {
-                SceneManager.LoadScene(sceneBuildIndex: 2);
+                SceneManager.LoadScene(sceneBuildIndex: TryAutoConfigure() ? 2 : 1);
             }
-            else
+            catch (Exception e)
             {
+                Debug.LogException(e);
                 SceneManager.LoadScene(sceneBuildIndex: 1);
             }
+            
         }
 
         private static bool TryAutoConfigure()
